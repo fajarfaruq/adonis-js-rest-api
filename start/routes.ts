@@ -53,4 +53,4 @@ Route.group(() => {
     Route.delete('delete/:id', 'BooksController.delete');
   }).prefix('book');
 
-}).prefix('api');
+}).prefix('api').middleware('auth:basic');

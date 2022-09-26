@@ -5,9 +5,6 @@
  * file.
  */
 
-import Users from 'App/Models/Users'
-import { JWTGuardConfig, JWTGuardContract } from "@ioc:Adonis/Addons/Jwt";
-
 declare module '@ioc:Adonis/Addons/Auth' {
   /*
   |--------------------------------------------------------------------------
@@ -27,16 +24,16 @@ declare module '@ioc:Adonis/Addons/Auth' {
     | User Provider
     |--------------------------------------------------------------------------
     |
-    | The following provider uses Lucid models as a driver for fetching user
-    | details from the database for authentication.
+    | The following provider directlly uses Database query builder for fetching
+    | user details from the database for authentication.
     |
     | You can create multiple providers using the same underlying driver with
-    | different Lucid models.
+    | different database tables.
     |
     */
     user: {
-      implementation: LucidProviderContract<typeof Users>
-      config: LucidProviderConfig<typeof Users>
+      implementation: DatabaseProviderContract<DatabaseProviderRow>
+      config: DatabaseProviderConfig
     }
   }
 
@@ -58,21 +55,17 @@ declare module '@ioc:Adonis/Addons/Auth' {
   interface GuardsList {
     /*
     |--------------------------------------------------------------------------
-    | OAT Guard
+    | Basic Auth Guard
     |--------------------------------------------------------------------------
     |
-    | OAT, stands for (Opaque access tokens) guard uses database backed tokens
-    | to authenticate requests.
+    | The basic guard uses basic auth for maintaining user login state. It uses
+    | the `user` provider for fetching user details.
     |
     */
-    api: {
-      implementation: OATGuardContract<'user', 'api'>
-      config: OATGuardConfig<'user'>
-      client: OATClientContract<'user'>
+    basic: {
+      implementation: BasicAuthGuardContract<'user', 'basic'>
+      config: BasicAuthGuardConfig<'user'>
+      client: BasicAuthClientContract<'user'>
     }
-    jwt: {
-      implementation: JWTGuardContract<'user', 'api'>,
-      config: JWTGuardConfig<'user'>,
-    };
   }
 }

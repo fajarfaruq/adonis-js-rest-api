@@ -1,6 +1,8 @@
 import { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { AuthenticationException } from '@adonisjs/auth/build/standalone'
+import Database from '@ioc:Adonis/Lucid/Database';
+import { base64 } from '@ioc:Adonis/Core/Helpers'
 
 /**
  * Auth middleware is meant to restrict un-authenticated access to a given route
@@ -60,8 +62,8 @@ export default class AuthMiddleware {
   /**
    * Handle request
    */
-  public async handle (
-    { auth }: HttpContextContract,
+  public async handle(
+    { request, auth, response }: HttpContextContract,
     next: () => Promise<void>,
     customGuards: (keyof GuardsList)[]
   ) {
@@ -69,8 +71,33 @@ export default class AuthMiddleware {
      * Uses the user defined guards or the default guard mentioned in
      * the config file
      */
-    const guards = customGuards.length ? customGuards : [auth.name]
-    await this.authenticate(auth, guards)
-    await next()
+    if (auth.defaultGuard == 'basic') {
+      const authorization = request.headers().authorization?.replace('Basic ', '').toString();
+      const authList = base64.decode(authorization || '').split(':')
+
+      if (authList.length == 2) {
+        const authResult = await Database
+          .query()
+          .from(auth.config.provider.usersTable)
+          .where('email', '=', authList[0])
+          .andWhere('password', '=', authList[1]);
+
+        if (authResult.length == 0) {
+          return response
+            .status(401)
+            .json({ code: 401, status: "Unauthorized access" });
+        }
+      }else{
+        return response
+            .status(401)
+            .json({ code: 401, status: "Unauthorized access" });
+      }
+
+      await next()
+    } else {
+      const guards = customGuards.length ? customGuards : [auth.name]
+      await this.authenticate(auth, guards)
+      await next()
+    }
   }
 }
