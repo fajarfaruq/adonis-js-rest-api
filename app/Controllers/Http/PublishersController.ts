@@ -88,7 +88,7 @@ export default class PublishersController {
 
     public async delete({ params, response }: HttpContextContract) {
         try {
-            const publishers = await Publisher.findBy('id', params.id);
+            const publishers = await Publisher.findBy('publisher_id', params.id);
             if (publishers == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }

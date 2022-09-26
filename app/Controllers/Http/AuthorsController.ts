@@ -88,7 +88,7 @@ export default class AuthorsController {
 
     public async delete({ params, response }: HttpContextContract) {
         try {
-            const authors = await Author.findBy('id', params.id);
+            const authors = await Author.findBy('author_id', params.id);
             if (authors == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }

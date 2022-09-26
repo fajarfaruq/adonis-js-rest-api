@@ -164,7 +164,7 @@ export default class BooksController {
     public async delete({ params, response }: HttpContextContract) {
         const trx = await Database.transaction()
         try {
-            const books = await Book.findBy('id', params.id);
+            const books = await Book.findBy('book_id', params.id);
             if (books == null) {
                 await trx.rollback();
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
