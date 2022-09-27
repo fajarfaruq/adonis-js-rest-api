@@ -2,13 +2,13 @@
 
 This repository contains a simple CRUD REST API using Adonis JS 5
 
+To install the this project, you can follow these steps:
+
 ## Tech Stack
 
 **Auth :** Basic Auth (Username and Password in the user table)
 
 **Developed on :** Adonis 5, Node 16.16.0, Npm 8.11.0, Mac OS Monterey 12.4 (Apple Silicon)
-
-To install the this project, you can follow these steps:
 
 ## Support File
 
