@@ -24,8 +24,10 @@ This file needs to be prepared before installing
 
 cp .env.example .env  --> (.env can modify as needed. ex. database setting)
 
+npm install 
+
 node ace db:seed -i --> (Select in order 1. Author, 2. Publisher, 3. Book, 4. User)
 
-npm install && npm run dev
+npm run dev
 
 ```
