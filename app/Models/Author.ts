@@ -1,5 +1,8 @@
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
+/**
+ * This class using for represent Authors Table
+ */
 export default class Author extends BaseModel {
   public static table = 'authors'
   
