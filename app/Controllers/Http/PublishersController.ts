@@ -13,7 +13,7 @@ export default class PublishersController {
 
     public async getById({ params, response }: HttpContextContract) {
         try {
-            const publishers = await Publisher.query().where('id', '=', params.id).first();
+            const publishers = await Publisher.query().where('publisher_id', '=', params.id).first();
             if (publishers == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }
@@ -72,7 +72,7 @@ export default class PublishersController {
 
             const payload = await request.validate({ schema: newPostSchema, messages });
 
-            const publishers = await Publisher.findBy('id', params.id);
+            const publishers = await Publisher.findBy('publisher_id', params.id);
             if (publishers == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }

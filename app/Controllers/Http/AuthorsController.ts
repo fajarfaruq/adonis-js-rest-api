@@ -13,7 +13,7 @@ export default class AuthorsController {
 
     public async getById({ params, response }: HttpContextContract) {
         try {
-            const authors = await Author.query().where('id', '=', params.id).first();
+            const authors = await Author.query().where('author_id', '=', params.id).first();
             if (authors == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }
@@ -72,7 +72,7 @@ export default class AuthorsController {
 
             const payload = await request.validate({ schema: newPostSchema, messages });
 
-            const authors = await Author.findBy('id', params.id);
+            const authors = await Author.findBy('author_id', params.id);
             if (authors == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }

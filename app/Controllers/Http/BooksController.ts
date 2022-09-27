@@ -9,8 +9,14 @@ import Publisher from 'App/Models/Publisher';
 
 export default class BooksController {
     public async getAll({ response }: HttpContextContract) {
-        const books = await Book.all();
 
+        const books = await Database
+            .from(Book.table)
+            .join('publishers', 'books.publisher_id', '=', 'publishers.publisher_id')
+            .select('books.*')
+            .select('publishers.name as publisher_name')
+            .select('publishers.description as publisher_description')
+        
         return response
             .status(200)
             .json({ code: 200, status: "success", data: books });
@@ -18,10 +24,28 @@ export default class BooksController {
 
     public async getById({ params, response }: HttpContextContract) {
         try {
-            const books = await Book.query().where('id', '=', params.id).first();
+            const books = await Database
+                .from(Book.table)
+                .join('publishers', 'books.publisher_id', '=', 'publishers.publisher_id')
+                .select('books.*')
+                .select('publishers.name as publisher_name')
+                .select('publishers.description as publisher_description')
+                .where('books.book_id', '=', params.id)
+                .first()
+            
             if (books == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }
+
+            const bookAuthors = await Database
+                    .from(BookAuthor.table)
+                    .join('authors', 'book_authors.author_id', '=', 'authors.author_id')
+                    .select('book_authors.*')
+                    .select('authors.name as author_name')
+                    .where('book_authors.book_id', '=', params.id);
+            
+            books['authors'] = bookAuthors;
+
             return response.status(200).json({ code: 200, status: 'success', data: books });
         } catch (err) {
             return response.status(500).json({ code: 500, status: 'error', message: err.messages });
@@ -30,10 +54,18 @@ export default class BooksController {
 
     public async getByName({ params, response }: HttpContextContract) {
         try {
-            const books = await Book.query().where('title', 'LIKE', '%' + params.name + '%');
+            const books = await Database
+                .from(Book.table)
+                .join('publishers', 'books.publisher_id', '=', 'publishers.publisher_id')
+                .select('books.*')
+                .select('publishers.name as publisher_name')
+                .select('publishers.description as publisher_description')
+                .where('title', 'LIKE', '%' + params.name + '%');
+
             if (books == null) {
                 return response.status(404).json({ code: 404, status: 'Data Not Found', data: null });
             }
+
             return response.status(200).json({ code: 200, status: 'success', data: books });
         } catch (err) {
             return response.status(500).json({ code: 500, status: 'error', message: err.messages });
@@ -154,7 +186,9 @@ export default class BooksController {
 
             await trx.commit();
 
-            return response.status(200).json({ code: 200, status: 'success', data: books });
+            const booksDetail = await Book.query().where('book_id', '=', bookId).first();
+
+            return response.status(200).json({ code: 200, status: 'success', data: booksDetail });
         } catch (err) {
             await trx.rollback();
             return response.status(500).json({ code: 500, status: 'error', message: err.messages });
